@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_todolist_app/screens/add_task_screen.dart';
 
 class TodoListScreen extends StatefulWidget {
   @override
@@ -6,41 +7,46 @@ class TodoListScreen extends StatefulWidget {
 }
 
 class _TodoListScreenState extends State<TodoListScreen> {
-
-  Widget _buildTask(int index){
-    return  Padding(
+  Widget _buildTask(int index) {
+    return Padding(
       padding: EdgeInsets.symmetric(horizontal: 25.0),
-      child: ListTile(
-        title: Text('Task title'),
-        subtitle: Text('03/11/2021 - High'),
-        trailing: Checkbox(
-            onChanged: (value){
-          print(value);},
-      activeColor: Theme.of(context).primaryColor,
-      value: true
-
-        ),
+      child: Column(
+        children: <Widget>[
+          ListTile(
+            title: Text('Task title'),
+            subtitle: Text('03/11/2021 - High'),
+            trailing: Checkbox(
+              onChanged: (value) {
+                print(value);
+              },
+              activeColor: Theme.of(context).primaryColor,
+              value: true,
+            ),
+          ),
+          Divider(),
+        ],
       ),
     );
   }
-
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-          backgroundColor: Theme.of(context).primaryColor,
-          child: Icon(Icons.add),
-          onPressed: () => print('Navigate to add task screen')),
+        backgroundColor: Theme.of(context).primaryColor,
+        child: Icon(Icons.add),
+        onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => AddTaskScreen()),
+            ),
+      ),
       body: ListView.builder(
         padding: EdgeInsets.symmetric(vertical: 80.0),
         itemCount: 10,
         itemBuilder: (BuildContext context, int index) {
           if (index == 0)
             return Padding(
-              padding:
-                   EdgeInsets.symmetric(horizontal: 40.0, vertical: 20.0),
+              padding: EdgeInsets.symmetric(horizontal: 40.0, vertical: 20.0),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
@@ -64,9 +70,8 @@ class _TodoListScreenState extends State<TodoListScreen> {
                   ]),
             );
 
-          return _buildTask( index);
+          return _buildTask(index);
         },
-
       ),
     );
   }
