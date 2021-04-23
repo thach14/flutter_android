@@ -1,9 +1,73 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/Helper/database_helper.dart';
 import 'package:flutter_app/Model/task_model.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:intl/intl.dart';
 
 
+class CustomPicker extends CommonPickerModel {
+  String digits(int value, int length) {
+    return '$value'.padLeft(length, "0");
+  }
+
+  CustomPicker({DateTime currentTime, LocaleType locale}) : super(locale: locale) {
+    this.currentTime = currentTime ?? DateTime.now();
+    this.setLeftIndex(this.currentTime.hour);
+    this.setMiddleIndex(this.currentTime.minute);
+    this.setRightIndex(this.currentTime.second);
+  }
+
+  @override
+  String leftStringAtIndex(int index) {
+    if (index >= 0 && index < 24) {
+      return this.digits(index, 2);
+    } else {
+      return null;
+    }
+  }
+
+  @override
+  String middleStringAtIndex(int index) {
+    if (index >= 0 && index < 60) {
+      return this.digits(index, 2);
+    } else {
+      return null;
+    }
+  }
+
+  @override
+  String rightStringAtIndex(int index) {
+    if (index >= 0 && index < 60) {
+      return this.digits(index, 2);
+    } else {
+      return null;
+    }
+  }
+
+  @override
+  String leftDivider() {
+    return "|";
+  }
+
+  @override
+  String rightDivider() {
+    return "|";
+  }
+
+  @override
+  List<int> layoutProportions() {
+    return [1, 2, 1];
+  }
+
+  @override
+  DateTime finalTime() {
+    return currentTime.isUtc
+        ? DateTime.utc(currentTime.year, currentTime.month, currentTime.day,
+        this.currentLeftIndex(), this.currentMiddleIndex(), this.currentRightIndex())
+        : DateTime(currentTime.year, currentTime.month, currentTime.day, this.currentLeftIndex(),
+        this.currentMiddleIndex(), this.currentRightIndex());
+  }
+}
 class AddTaskSreen extends StatefulWidget {
   final Task task;
   final Function updateTaskList;
@@ -23,22 +87,21 @@ class _AddTaskSreenState extends State<AddTaskSreen> {
 
   TextEditingController _dateController = TextEditingController();
 
-  final DateFormat _dateFormat = DateFormat('MMM dd, yyyy');
+  final DateFormat _dateFormat = DateFormat('HH:mm, MMM dd, yyyy');
   final List<String> _priorities = ['Low', 'Medium', 'High'];
 
   _handleDatePicker() async {
-    final DateTime date = await showDatePicker(
-        context: context,
-        initialDate: _date,
-        firstDate: DateTime(2000),
-        lastDate: DateTime(2100));
-    if (date != null && date != _date) {
-      setState(() {
-        _date = date;
-      });
-      _dateController.text = _dateFormat.format(date);
+
+      DatePicker.showDateTimePicker(context,
+          showTitleActions: true, onChanged: (date) {
+
+          }, onConfirm: (date){
+            _date = date;
+            _dateController.text=_dateFormat.format(date).toString();
+          },
+          currentTime: DateTime.now());
     }
-  }
+
 
   _submit() {
     if (_formKey.currentState.validate()) {
@@ -147,17 +210,17 @@ class _AddTaskSreenState extends State<AddTaskSreen> {
                         ),
                         child: TextFormField(
                           readOnly: true,
-                          controller: _dateController,
+
                           onTap: _handleDatePicker,
+                          controller: _dateController,
                           style: TextStyle(fontSize: 18),
                           decoration: InputDecoration(
-                              labelText: 'Date',
+                              labelText: 'Date Time',
                               labelStyle: TextStyle(fontSize: 18),
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10))),
-                          validator: (input) => input.trim().isEmpty
-                              ? "Please enter a task"
-                              : null,
+
+                          onChanged: (dt) => setState(() => _date= DateTime.parse(dt)),
                         ),
                       ),
                       Padding(

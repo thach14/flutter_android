@@ -13,7 +13,8 @@ class TodoListScreeen extends StatefulWidget {
 
 class _TodoListScreeenState extends State<TodoListScreeen> {
   Future<List<Task>> _taskList;
-  final DateFormat _dateFormat = DateFormat('MMM dd,yyyy');
+  final DateFormat _dateFormat = DateFormat('HH:mm , MMM dd,yyyy');
+  final DateFormat _datePick = DateFormat('MMM dd,yyyy');
 
   @override
   void initState() {
@@ -25,6 +26,21 @@ class _TodoListScreeenState extends State<TodoListScreeen> {
     setState(() {
       _taskList = DatabaseHelper.instance.getTaskList();
     });
+  }
+  DateTime _date = DateTime.now();
+  TextEditingController _dateController = TextEditingController();
+  _handleDatePicker() async {
+    final DateTime date = await showDatePicker(
+        context: context,
+        initialDate: _date,
+        firstDate: DateTime(2000),
+        lastDate: DateTime(2100));
+    if (date != null && date != _date) {
+      setState(() {
+        _date = date;
+      });
+      _dateController.text = _datePick.format(_date);
+    }
   }
 
   Widget _buildTask(Task task) {
@@ -125,11 +141,31 @@ class _TodoListScreeenState extends State<TodoListScreeen> {
                               fontSize: 20,
                               color: Colors.grey,
                               fontWeight: FontWeight.w600),
-                        )
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 20,
+                          ),
+                          child: TextFormField(
+                            readOnly: true,
+                            controller: _dateController,
+                            onTap: _handleDatePicker,
+                            style: TextStyle(fontSize: 18),
+                            decoration: InputDecoration(
+                                labelText: 'Date',
+                                labelStyle: TextStyle(fontSize: 18),
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10))),
+                            validator: (input) => input.trim().isEmpty
+                                ? "Please enter a task"
+                                : null,
+                          ),
+                        ),
                       ],
                     ),
                   );
                 }
+
                 return _buildTask(snapshot.data[i - 1]);
               },
             );
