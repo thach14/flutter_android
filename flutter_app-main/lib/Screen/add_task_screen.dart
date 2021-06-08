@@ -88,7 +88,7 @@ class _AddTaskScreenState extends State<AddTaskSrceen> {
   TextEditingController _dateController = TextEditingController();
 
   final DateFormat _dateFormat = DateFormat('HH:mm, MMM dd, yyyy');
-  final List<String> _priorities = ['Low', 'Medium', 'High'];
+  final List<String> _priorities = ['Family', 'Work', 'Relax'];
 
   _handleDatePicker() async {
 
